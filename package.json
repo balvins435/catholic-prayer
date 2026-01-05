@@ -1,0 +1,33 @@
+{
+  "name": "catholic-prayer-app",
+  "version": "1.0.0",
+  "description": "Catholic Prayers and Daily Readings App",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "start": "vite"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.13.2",
+    "date-fns": "^2.30.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.20.0",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.27",
+    "@types/react": "^18.3.27",
+    "@types/react-dom": "^18.3.7",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "^4.2.0",
+    "dotenv": "^17.2.3",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  }
+}
