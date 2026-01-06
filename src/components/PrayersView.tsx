@@ -1,23 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  fetchPrayers, 
-  prayerCategories, 
-  Prayer, 
-  PrayerCategory,
-  generateCustomPrayer,
-  searchPrayers
-} from '../services/geminiService';
-
+import { databaseService } from '../services/databaseService';
+import type { Prayer, PrayerCategory } from '../database/schema';
+// import './PrayersView.css';
 
 const PrayersView: React.FC = () => {
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [filteredPrayers, setFilteredPrayers] = useState<Prayer[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<PrayerCategory | 'all'>('all');
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [customIntention, setCustomIntention] = useState('');
-  const [customPrayer, setCustomPrayer] = useState('');
-  const [generating, setGenerating] = useState(false);
+  const [categories, setCategories] = useState<PrayerCategory[]>([
+    'daily', 'morning', 'evening', 'rosary', 'divine-mercy',
+    'sacraments', 'saints', 'novenas', 'litanies', 'thanksgiving'
+  ]);
 
   useEffect(() => {
     loadPrayers();
@@ -30,7 +25,7 @@ const PrayersView: React.FC = () => {
   const loadPrayers = async () => {
     try {
       setLoading(true);
-      const data = await fetchPrayers();
+      const data = await databaseService.getAllPrayers();
       setPrayers(data);
       setFilteredPrayers(data);
     } catch (error) {
@@ -44,15 +39,15 @@ const PrayersView: React.FC = () => {
     let filtered = [...prayers];
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(prayer => 
-        prayer.category.toLowerCase() === selectedCategory.toLowerCase()
-      );
+      filtered = filtered.filter(prayer => prayer.category === selectedCategory);
     }
 
     if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(prayer =>
-        prayer.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        prayer.text.toLowerCase().includes(searchQuery.toLowerCase())
+        prayer.title.toLowerCase().includes(query) ||
+        prayer.text.toLowerCase().includes(query) ||
+        prayer.tags.some(tag => tag.toLowerCase().includes(query))
       );
     }
 
@@ -63,7 +58,7 @@ const PrayersView: React.FC = () => {
     if (searchQuery.trim()) {
       setLoading(true);
       try {
-        const results = await searchPrayers(searchQuery);
+        const results = await databaseService.searchPrayers(searchQuery);
         setFilteredPrayers(results);
       } catch (error) {
         console.error('Search error:', error);
@@ -75,19 +70,9 @@ const PrayersView: React.FC = () => {
     }
   };
 
-  const handleGenerateCustomPrayer = async () => {
-    if (!customIntention.trim()) return;
-    
-    setGenerating(true);
-    try {
-      const prayer = await generateCustomPrayer(customIntention);
-      setCustomPrayer(prayer);
-    } catch (error) {
-      console.error('Error generating prayer:', error);
-      setCustomPrayer('Lord, hear our prayer. Amen.');
-    } finally {
-      setGenerating(false);
-    }
+  const handleToggleFavorite = async (prayerId: string) => {
+    await databaseService.toggleFavorite(prayerId);
+    loadPrayers(); // Refresh list
   };
 
   const handleCopyPrayer = (text: string) => {
@@ -95,12 +80,28 @@ const PrayersView: React.FC = () => {
     alert('Prayer copied to clipboard!');
   };
 
+  const getCategoryDisplayName = (category: string): string => {
+    const names: Record<string, string> = {
+      'daily': 'Daily Prayers',
+      'morning': 'Morning Prayers',
+      'evening': 'Evening Prayers',
+      'rosary': 'Holy Rosary',
+      'divine-mercy': 'Divine Mercy',
+      'sacraments': 'Sacraments',
+      'saints': 'Saints Prayers',
+      'novenas': 'Novenas',
+      'litanies': 'Litanies',
+      'thanksgiving': 'Thanksgiving'
+    };
+    return names[category] || category;
+  };
+
   if (loading) {
     return (
       <div className="prayers-container">
         <div className="loading">
           <div className="spinner"></div>
-          <p>Loading prayers...</p>
+          <p>Loading prayers from database...</p>
         </div>
       </div>
     );
@@ -109,16 +110,16 @@ const PrayersView: React.FC = () => {
   return (
     <div className="prayers-container">
       <header className="prayers-header">
-        <h1>📿 Catholic Prayers</h1>
-        <p className="subtitle">Traditional and devotional prayers for every occasion</p>
+        <h1>📿 Catholic Prayers Database</h1>
+        <p className="subtitle">{prayers.length}+ traditional prayers available offline</p>
       </header>
 
-      {/* Search and Filter Section */}
+      {/* Search and Filter */}
       <div className="controls-section">
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search prayers..."
+            placeholder="Search prayers by title, text, or tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -135,48 +136,34 @@ const PrayersView: React.FC = () => {
           >
             All Prayers
           </button>
-          {prayerCategories.map(category => (
+          {categories.map(category => (
             <button
-              key={category.id}
-              className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(category.id)}
+              key={category}
+              className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(category)}
             >
-              {category.icon} {category.name}
+              {getCategoryDisplayName(category)}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Custom Prayer Generator */}
-      <div className="custom-prayer-section">
-        <h2>✍️ Create Custom Prayer</h2>
-        <div className="custom-prayer-input">
-          <textarea
-            placeholder="Enter your prayer intention (e.g., for healing, gratitude, guidance)..."
-            value={customIntention}
-            onChange={(e) => setCustomIntention(e.target.value)}
-            rows={3}
-          />
-          <button 
-            onClick={handleGenerateCustomPrayer} 
-            disabled={generating || !customIntention.trim()}
-            className="generate-btn"
-          >
-            {generating ? 'Generating...' : 'Generate Prayer'}
-          </button>
+      {/* Stats */}
+      <div className="stats-bar">
+        <div className="stat-item">
+          <span className="stat-number">{prayers.length}</span>
+          <span className="stat-label">Total Prayers</span>
         </div>
-        {customPrayer && (
-          <div className="generated-prayer">
-            <h3>Your Custom Prayer:</h3>
-            <p className="prayer-text">{customPrayer}</p>
-            <button 
-              onClick={() => handleCopyPrayer(customPrayer)}
-              className="copy-btn"
-            >
-              📋 Copy Prayer
-            </button>
-          </div>
-        )}
+        <div className="stat-item">
+          <span className="stat-number">
+            {prayers.filter(p => p.favorite).length}
+          </span>
+          <span className="stat-label">Favorites</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-number">{filteredPrayers.length}</span>
+          <span className="stat-label">Showing</span>
+        </div>
       </div>
 
       {/* Prayers Grid */}
@@ -185,65 +172,74 @@ const PrayersView: React.FC = () => {
           filteredPrayers.map(prayer => (
             <div key={prayer.id} className="prayer-card">
               <div className="prayer-header">
-                <h3>{prayer.title}</h3>
-                <span className="prayer-category">{prayer.category}</span>
+                <div>
+                  <h3>{prayer.title}</h3>
+                  <span className="prayer-category">
+                    {getCategoryDisplayName(prayer.category)}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleToggleFavorite(prayer.id)}
+                  className={`favorite-btn ${prayer.favorite ? 'favorited' : ''}`}
+                >
+                  {prayer.favorite ? '★' : '☆'}
+                </button>
               </div>
+              
               <div className="prayer-content">
                 <p className="prayer-text">{prayer.text}</p>
               </div>
-              <div className="prayer-actions">
-                <button 
-                  onClick={() => handleCopyPrayer(prayer.text)}
-                  className="action-btn copy"
-                >
-                  📋 Copy
-                </button>
-                <button className="action-btn favorite">
-                  ⭐ Favorite
-                </button>
-                <button className="action-btn share">
-                  📤 Share
-                </button>
+              
+              <div className="prayer-tags">
+                {prayer.tags.map(tag => (
+                  <span key={tag} className="tag">{tag}</span>
+                ))}
               </div>
-              {prayer.language && (
-                <div className="prayer-footer">
-                  <span className="language-tag">Language: {prayer.language}</span>
-                  {prayer.length && (
-                    <span className="length-tag">Length: {prayer.length}</span>
+              
+              <div className="prayer-footer">
+                <div className="prayer-meta">
+                  {prayer.language && (
+                    <span className="language-tag">🌐 {prayer.language}</span>
                   )}
+                  <span className="length-tag">📏 {prayer.length}</span>
                 </div>
-              )}
+                
+                <div className="prayer-actions">
+                  <button 
+                    onClick={() => handleCopyPrayer(prayer.text)}
+                    className="action-btn copy"
+                  >
+                    📋 Copy
+                  </button>
+                  <button className="action-btn share">
+                    📤 Share
+                  </button>
+                </div>
+              </div>
             </div>
           ))
         ) : (
           <div className="no-results">
             <p>No prayers found. Try a different search or category.</p>
+            <button onClick={() => {
+              setSelectedCategory('all');
+              setSearchQuery('');
+            }} className="clear-filters">
+              Clear Filters
+            </button>
           </div>
         )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="quick-actions">
-        <button onClick={loadPrayers} className="quick-btn refresh">
-          🔄 Refresh Prayers
-        </button>
-        <button className="quick-btn favorites">
-          ⭐ View Favorites
-        </button>
-        <button className="quick-btn random">
-          🎲 Random Prayer
-        </button>
-      </div>
-
-      {/* Prayer Tips */}
-      <div className="prayer-tips">
-        <h3>💡 Prayer Tips</h3>
-        <ul>
-          <li>Find a quiet place to pray</li>
-          <li>Speak from your heart - God listens</li>
-          <li>Pray regularly to strengthen your faith</li>
-          <li>Share prayers with family and friends</li>
-        </ul>
+      {/* Database Info */}
+      <div className="database-info">
+        <h3>📦 Local Database</h3>
+        <p>All prayers are stored locally on your device. No internet connection required.</p>
+        <p className="info-note">
+          Last updated: {new Date().toLocaleDateString()} | 
+          Total: {prayers.length} prayers | 
+          Storage: ~{(prayers.length * 0.5).toFixed(1)}MB
+        </p>
       </div>
     </div>
   );
