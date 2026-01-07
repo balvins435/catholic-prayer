@@ -11,10 +11,20 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    host: true
   },
-  // This ensures environment variables are available
-  define: {
-    'process.env': {}
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'database': ['dexie', 'dexie-react-hooks'],
+          'utils': ['date-fns', 'axios']
+        }
+      }
+    }
   }
 })

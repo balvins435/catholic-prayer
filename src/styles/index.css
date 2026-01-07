@@ -1,144 +1,304 @@
-/* Loading States */
-.app-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #8B0000 0%, #4A0000 100%);
-  color: white;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-catholic-red: 139 0 0;
+    --color-catholic-gold: 255 215 0;
+    --color-catholic-green: 46 139 87;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-800 antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+
+  ::selection {
+    @apply bg-catholic-red/20 text-catholic-red;
+  }
 }
 
-.loading-spinner-large {
-  text-align: center;
+@layer components {
+  /* Button Components */
+  .btn {
+    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 
+           focus:outline-none focus:ring-2 focus:ring-offset-2 
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-catholic-red text-white hover:bg-catholic-dark-red 
+           focus:ring-catholic-red shadow-md hover:shadow-lg 
+           transform hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply btn bg-catholic-green text-white hover:bg-green-700 
+           focus:ring-catholic-green;
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-catholic-red text-catholic-red 
+           hover:bg-catholic-red hover:text-white focus:ring-catholic-red;
+  }
+
+  .btn-ghost {
+    @apply btn text-catholic-red hover:bg-catholic-red/10 
+           focus:ring-catholic-red/50;
+  }
+
+  /* Card Components */
+  .card {
+    @apply bg-white rounded-xl shadow-md p-6 transition-all duration-300 
+           hover:shadow-lg border border-gray-100;
+  }
+
+  .card-catholic {
+    @apply card border-t-4 border-catholic-red;
+  }
+
+  .card-rosary {
+    @apply card border-t-4 border-catholic-green;
+  }
+
+  .card-saints {
+    @apply card border-t-4 border-catholic-gold;
+  }
+
+  /* Input Components */
+  .input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg 
+           focus:outline-none focus:ring-2 focus:ring-catholic-red 
+           focus:border-transparent transition-all duration-300 
+           placeholder:text-gray-400;
+  }
+
+  .input-search {
+    @apply input pl-12 bg-gray-50;
+  }
+
+  /* Navigation */
+  .nav-link {
+    @apply px-4 py-2 rounded-lg text-white hover:bg-white/10 
+           transition-colors duration-300 font-medium;
+  }
+
+  .nav-link.active {
+    @apply bg-white/20;
+  }
+
+  /* Prayer Text */
+  .prayer-text {
+    @apply text-lg leading-relaxed text-gray-700 font-serif;
+  }
+
+  .prayer-text-latin {
+    @apply prayer-text italic text-gray-600;
+  }
+
+  /* Tag Components */
+  .tag {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .tag-category {
+    @apply tag bg-red-100 text-catholic-red;
+  }
+
+  .tag-language {
+    @apply tag bg-blue-100 text-blue-800;
+  }
+
+  .tag-saint {
+    @apply tag bg-amber-100 text-amber-800;
+  }
+
+  /* Loading Spinner */
+  .spinner {
+    @apply animate-spin rounded-full border-4 border-gray-300 border-t-catholic-red;
+  }
+
+  /* Progress Bar */
+  .progress-bar {
+    @apply w-full h-2 bg-gray-200 rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-gradient-to-r from-catholic-red to-red-600 
+           rounded-full transition-all duration-500;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50;
+  }
+
+  .modal-content {
+    @apply bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] 
+           overflow-y-auto animate-fade-in;
+  }
+
+  /* Stats */
+  .stat-card {
+    @apply bg-white rounded-xl p-6 shadow-sm text-center;
+  }
+
+  .stat-number {
+    @apply text-4xl font-bold text-catholic-red mb-2;
+  }
+
+  .stat-label {
+    @apply text-gray-600 text-sm font-medium uppercase tracking-wider;
+  }
+
+  /* Section Headers */
+  .section-header {
+    @apply text-3xl md:text-4xl font-bold text-gray-900 text-center mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-gray-600 text-center mb-8 text-lg max-w-2xl mx-auto;
+  }
+
+  /* Feature Cards */
+  .feature-card {
+    @apply card-catholic p-8 text-center hover:shadow-catholic 
+           hover:-translate-y-2;
+  }
+
+  /* Mysteries */
+  .mystery-btn {
+    @apply px-6 py-3 rounded-lg border-2 border-gray-200 font-medium 
+           hover:border-catholic-red hover:text-catholic-red 
+           transition-all duration-300 text-center;
+  }
+
+  .mystery-btn.active {
+    @apply bg-catholic-red text-white border-catholic-red shadow-catholic;
+  }
+
+  /* Prayer Counter */
+  .counter {
+    @apply text-center p-4 rounded-xl bg-gradient-to-br from-gray-50 to-white;
+  }
+
+  .counter-number {
+    @apply text-5xl font-bold text-catholic-red;
+  }
+
+  .counter-label {
+    @apply text-gray-600 mt-2 font-medium;
+  }
+
+  /* Alert Messages */
+  .alert {
+    @apply p-4 rounded-xl border-l-4;
+  }
+
+  .alert-info {
+    @apply alert border-blue-500 bg-blue-50 text-blue-800;
+  }
+
+  .alert-warning {
+    @apply alert border-amber-500 bg-amber-50 text-amber-800;
+  }
+
+  .alert-success {
+    @apply alert border-green-500 bg-green-50 text-green-800;
+  }
 }
 
-.loading-spinner-large .spinner {
-  width: 80px;
-  height: 80px;
-  border: 8px solid rgba(255, 255, 255, 0.3);
-  border-top: 8px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
+@layer utilities {
+  /* Text Gradients */
+  .text-gradient-catholic {
+    @apply bg-gradient-to-r from-catholic-red to-catholic-dark-red 
+           bg-clip-text text-transparent;
+  }
 
-.loading-sub {
-  opacity: 0.8;
-  font-size: 0.9rem;
-  margin-top: 10px;
-}
+  .text-gradient-rosary {
+    @apply bg-gradient-to-r from-catholic-green to-green-800 
+           bg-clip-text text-transparent;
+  }
 
-/* Home Page */
-.home-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 20px;
-}
+  /* Custom Shadows */
+  .shadow-catholic {
+    box-shadow: 0 10px 40px rgba(139, 0, 0, 0.15);
+  }
 
-.home-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
+  /* Line Clamp */
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
 
-.home-header h2 {
-  color: #8B0000;
-  font-size: 2.2rem;
-  margin-bottom: 10px;
-}
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
 
-.subtitle {
-  color: #666;
-  font-size: 1.1rem;
-}
+  .line-clamp-4 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 25px;
-  margin: 40px 0;
-}
+  /* Scrollbar Styling */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
 
-.feature-card {
-  background: white;
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-  transition: transform 0.3s;
-  border-top: 4px solid #8B0000;
-}
+  .scrollbar-thin::-webkit-scrollbar {
+    @apply w-2;
+  }
 
-.feature-card:hover {
-  transform: translateY(-5px);
-}
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+  }
 
-.feature-card h3 {
-  color: #333;
-  margin-bottom: 10px;
-  font-size: 1.4rem;
-}
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded-full;
+  }
 
-.feature-card p {
-  color: #666;
-  margin-bottom: 20px;
-  line-height: 1.6;
-}
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
 
-.feature-link {
-  color: #8B0000;
-  text-decoration: none;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
+  /* Animation Delays */
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
 
-.feature-link:hover {
-  text-decoration: underline;
-}
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
 
-.offline-notice {
-  background: #fff3cd;
-  border: 1px solid #ffecb5;
-  border-radius: 10px;
-  padding: 20px;
-  margin-top: 40px;
-  text-align: center;
-}
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
 
-.offline-notice h3 {
-  color: #856404;
-  margin-bottom: 10px;
-}
+  /* Catholic Icons */
+  .icon-cross {
+    @apply text-2xl text-catholic-red;
+  }
 
-.offline-notice p {
-  color: #856404;
-  margin: 0;
-}
+  .icon-rosary {
+    @apply text-2xl text-catholic-green;
+  }
 
-/* Navigation Updates */
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.db-warning {
-  background: #ff9800;
-  color: white;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-/* Footer Updates */
-.footer-version {
-  font-size: 0.9rem;
-  color: #999;
-  margin-top: 5px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  .icon-saint {
+    @apply text-2xl text-catholic-gold;
+  }
 }

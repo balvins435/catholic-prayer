@@ -1,6 +1,4 @@
 
-import React from 'react';
-
 export default function LoadingSpinner() {
   return (
     <div className="flex flex-col items-center justify-center gap-4" aria-label="Loading content">
