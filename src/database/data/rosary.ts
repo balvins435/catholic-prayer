@@ -1,4 +1,4 @@
-import { RosaryMystery, RosaryMysteryType } from '../database/schema';
+import { RosaryMystery, RosaryMysteryType } from '../schema';
 
 export const defaultRosaryMysteries: RosaryMystery[] = [
   // Joyful Mysteries

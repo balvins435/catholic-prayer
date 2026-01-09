@@ -1,4 +1,4 @@
-import { Saint } from '../database/schema';
+import { Saint } from '../schema';
 
 export const defaultSaints: Saint[] = [
   {

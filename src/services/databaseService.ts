@@ -4,7 +4,7 @@ import type {
 } from './catholicApiService';
 
 // Import local prayers data
-import { prayers, getPrayersByCategory, searchPrayers, getFavoritePrayers } from '../data/prayers';
+import { prayers, getPrayersByCategory, searchPrayers, getFavoritePrayers } from '../database/data/prayers';
 
 class DatabaseService {
   private localPrayers: Prayer[] = prayers;

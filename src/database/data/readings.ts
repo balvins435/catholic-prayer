@@ -1,4 +1,4 @@
-import { Reading, LiturgicalSeason, LiturgicalColor, FeastRank } from '../database/schema';
+import { Reading, LiturgicalSeason, LiturgicalColor, FeastRank } from '../schema';
 import { format, addDays } from 'date-fns';
 
 export const defaultReadings: Reading[] = [

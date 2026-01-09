@@ -143,11 +143,11 @@ export async function initializeDatabase() {
       console.log('Initializing database with default data...');
       
       // Import and add all default data
-      const { defaultPrayers } = await import('../data/prayers');
-      const { defaultReadings } = await import('../data/readings');
-      const { defaultRosaryMysteries } = await import('../data/rosary');
-      const { defaultSaints } = await import('../data/saints');
-      const { defaultLiturgicalHours } = await import('../data/liturgicalHours');
+      const { defaultPrayers } = await import('./data/prayers');
+      const { defaultReadings } = await import('./data/readings');
+      const { defaultRosaryMysteries } = await import('./data/rosary');
+      const { defaultSaints } = await import('./data/saints');
+      const { defaultLiturgicalHours } = await import('./data/liturgicalHours');
       
       await db.transaction('rw', 
         db.prayers, db.readings, db.rosaryMysteries, db.saints, db.liturgicalHours,
